@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command AutoAudit</Text>
+    <Description>Some description for AutoAudit</Description>
+    <Assembly>AutoAudit.dll</Assembly>
+    <FullClassName>AutoAudit.Command</FullClassName>
+    <ClientId>fc5e4c77-ded2-4497-9ddb-faac139dcfe1</ClientId>
+    <VendorId>AMAA</VendorId>
+    <VendorDescription>Ryan T. McCullough</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Application AutoAudit</Name>
+    <Assembly>AutoAudit.dll</Assembly>
+    <FullClassName>AutoAudit.App</FullClassName>
+    <ClientId>0d0cb792-1790-4b80-b266-d8738a7a0b0d</ClientId>
+    <VendorId>AMAA</VendorId>
+    <VendorDescription>Ryan T. McCullough</VendorDescription>
+  </AddIn>
+</RevitAddIns>
