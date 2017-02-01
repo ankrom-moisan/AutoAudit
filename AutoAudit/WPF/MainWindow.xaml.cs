@@ -20,6 +20,10 @@ namespace AutoAudit
         private delegate void ProgressBarDelegate();
         public string secondsRemaining;
 
+        /// <summary>
+        /// Initialize the window and instantiate Revit Application Data
+        /// </summary>
+        /// <param name="commandData">Application Data from Revit</param>
         public MainWindow(ExternalCommandData commandData)
         {
             _commandData = commandData;
@@ -27,20 +31,30 @@ namespace AutoAudit
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
 
+        /// <summary>
+        /// Main application logic
+        /// Executes on "ok" click
+        /// opens selected files, audits them, and saves then closes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
             // Guard Condition
             if (filePaths.Length == 0) Close();
 
+            // Setup progress bar animation
             progressBar.IsIndeterminate = false;
             progressBar.Maximum = filePaths.Length;
             progressBar.Minimum = 0;
 
+            // required stateful variables for tracking progress
             int numComplete = 0;
             int numRemaining = filePaths.Length;
             bool backupUndeleted = false;
             IList<string> problemFiles = new List<string>();
-
+            
+            // create a timer to show time remaining
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
@@ -94,25 +108,35 @@ namespace AutoAudit
                 }
                 catch (Exception)
                 {
-                    // TODO: Implement custom exception to bubble up to main application.
                     string fileName = path.Split('\\').Last();
                     problemFiles.Add(fileName);
                     continue;
                 }
             }
 
-            // Return control to main application
             stopWatch.Stop();
             TaskDialog.Show("AutoAudit", "All audits and upgrades complete!");
+
+            // Show any files that could not be processed or deleted
             if (backupUndeleted) problemFiles.Add("Some backups could not be deleted");
             if (problemFiles.Count != 0)
             {
                 ErrorWindow errWindow = new ErrorWindow(problemFiles);
                 errWindow.ShowDialog();
             }
+
+            // Return control to main application
             Close();
         }
 
+        /// <summary>
+        /// Calculates the estimated time remaining using the average
+        /// time per iteration multiplied by the remaining iterations
+        /// </summary>
+        /// <param name="sw">A stopwatch object</param>
+        /// <param name="numComplete">Completed Iterations</param>
+        /// <param name="numRemaining">Remaining Iterations</param>
+        /// <returns></returns>
         private string TimeLeft(Stopwatch sw, int numComplete, int numRemaining)
         {
             // Guard Condition
@@ -131,6 +155,9 @@ namespace AutoAudit
             return seconds.ToString() + " sec";
         }
 
+        /// <summary>
+        /// Delegate to update progress bar animation in seperate thread
+        /// </summary>
         private void UpdateProgress()
         {
             progressBar.Value += 1;
@@ -138,6 +165,12 @@ namespace AutoAudit
             lblTimeRemaining.Content = "Time Left: ~" + secondsRemaining;
         }
 
+        /// <summary>
+        /// Event Handler to open the File Selection Dialog
+        /// Saves selections to a string array "filePaths"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void open_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
